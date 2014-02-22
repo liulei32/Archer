@@ -117,7 +117,7 @@
         </option>
         <option>
           <name>DdfFile master</name>
-          <state>$TOOLKIT_DIR$\config\devices\Texas Instruments\ioCC2540F256.ddf</state>
+          <state>$TOOLKIT_DIR$\config\devices\Texas Instruments\ioCC2541F256.ddf</state>
         </option>
         <option>
           <name>OCImagesOffset1</name>

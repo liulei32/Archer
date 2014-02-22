@@ -84,7 +84,7 @@ static ancsCBs_t *ancs_AppCBs = NULL;
 static CONST gattAttrType_t ancsService = { ATT_BT_UUID_SIZE, ancsServUUID };
 
 // Enabler Characteristic Properties
-static uint8 ancsEnabledCharProps = GATT_PROP_WRITE | GATT_PROP_AUTHEN;
+static uint8 ancsEnabledCharProps = GATT_PROP_READ | GATT_PROP_WRITE | GATT_PROP_AUTHEN;
 
 // Enabler Characteristic Value
 static uint8 ancsEnabled = FALSE;
@@ -171,7 +171,7 @@ static gattAttribute_t ancsAttrTbl[SERVAPP_NUM_ATTR_SUPPORTED] =
       // ANCS Enable Characteristic Value
       { 
         { ATT_BT_UUID_SIZE, ancsEnablerUUID },
-        GATT_PERMIT_WRITE | GATT_PERMIT_AUTHEN_WRITE, 
+        GATT_PERMIT_READ | GATT_PERMIT_WRITE | GATT_PERMIT_AUTHEN_WRITE, 
         0,
         &ancsEnabled 
       },
@@ -559,7 +559,8 @@ static uint8 ancs_ReadAttrCB( uint16 connHandle, gattAttribute_t *pAttr,
         *pLen = controlPointLength;
         VOID osal_memcpy( pValue, pAttr->pValue, controlPointLength );
         break;
-        
+      
+      case ANCS_ENABLER_UUID:
       case DATASRC_ENABLER_UUID:
         *pLen = 1;
         pValue[0] = *pAttr->pValue;

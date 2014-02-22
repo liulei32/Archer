@@ -17,15 +17,15 @@
         <debug>1</debug>
         <option>
           <name>DerivativeDescriptionFile</name>
-          <state>$TOOLKIT_DIR$\config\devices\Texas Instruments\CC2540F256.i51</state>
+          <state>$TOOLKIT_DIR$\config\devices\Texas Instruments\CC2541F256.i51</state>
         </option>
         <option>
           <name>Previous Derivative File</name>
-          <state>$TOOLKIT_DIR$\config\devices\Texas Instruments\CC2540F256.i51</state>
+          <state>$TOOLKIT_DIR$\config\devices\Texas Instruments\CC2541F256.i51</state>
         </option>
         <option>
           <name>Showed Derivative</name>
-          <state>CC2540F256</state>
+          <state>CC2541F256</state>
         </option>
         <option>
           <name>CPU Core</name>
@@ -102,11 +102,11 @@
         </option>
         <option>
           <name>DPS Address</name>
-          <state></state>
+          <state>0x92</state>
         </option>
         <option>
           <name>Sfr Visibility</name>
-          <state>0</state>
+          <state>1</state>
         </option>
         <option>
           <name>DPTR Addresses</name>
@@ -225,7 +225,7 @@
         </option>
         <option>
           <name>PDATA 16-31 register address</name>
-          <state>0xEA</state>
+          <state></state>
         </option>
         <option>
           <name>General Far22 Heap Size</name>
@@ -275,6 +275,7 @@
           <state>HAL_LCD=FALSE</state>
           <state>HAL_LED=TRUE</state>
           <state>CC2540_MINIDK</state>
+          <state>CC2541</state>
         </option>
         <option>
           <name>CCPreprocFile</name>
@@ -8581,6 +8582,12 @@
   <group>
     <name>APP</name>
     <file>
+      <name>$PROJ_DIR$\..\Source\BLECentral.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\Source\BLECentral.h</name>
+    </file>
+    <file>
       <name>$PROJ_DIR$\..\Source\cma3000d.c</name>
     </file>
     <file>
@@ -8689,6 +8696,9 @@
             <name>$PROJ_DIR$\..\..\..\..\Components\hal\target\CC2540EB\hal_flash.c</name>
           </file>
           <file>
+            <name>$PROJ_DIR$\..\..\..\..\Components\hal\target\CC2540EB\hal_i2c.c</name>
+          </file>
+          <file>
             <name>$PROJ_DIR$\..\..\..\..\Components\hal\target\CC2540EB\hal_key.c</name>
           </file>
           <file>
@@ -8720,6 +8730,9 @@
           </file>
           <file>
             <name>$PROJ_DIR$\..\..\..\..\Components\hal\target\CC2540EB\hal_dma.h</name>
+          </file>
+          <file>
+            <name>$PROJ_DIR$\..\..\..\..\Components\hal\target\CC2540EB\hal_i2c.h</name>
           </file>
           <file>
             <name>$PROJ_DIR$\..\..\..\..\Components\hal\target\CC2540EB\hal_mcu.h</name>
@@ -8771,6 +8784,12 @@
     <name>LIB</name>
     <file>
       <name>$PROJ_DIR$\..\..\Libraries\CC2540DB\bin\CC2540_BLE_peri.lib</name>
+      <excluded>
+        <configuration>CC2540DK-MINI Keyfob</configuration>
+      </excluded>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\Libraries\CC2541DB\bin\CC2541_BLE_peri.lib</name>
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\Libraries\Common\bin\CC254x_BLE_HCI_TL_None.lib</name>
