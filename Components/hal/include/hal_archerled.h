@@ -92,11 +92,6 @@ extern "C"
  * Initialize LED Service.
  */
 extern void HalLedInit( void );
-/*
- * Archer LED Function
- *
- */
-extern void ArcherLedSet(uint8 ledIndex, uint8 color, uint8 numBlinks, uint8 offsetTime, uint8 onTime, uint8 offTime);
 
 /*
  * Set the LED ON/OFF/TOGGLE.
@@ -123,6 +118,25 @@ extern void HalLedExitSleep( void );
  */
 extern uint8 HalLedGetState ( void );
 
+/*
+ * Archer LED Function
+ */
+extern void ArcherLedSet(uint8 ledIndex, uint8 color, uint8 numBlinks, uint8 offsetTime, uint8 onTime, uint8 offTime);
+
+/*
+ * Archer LED Initialize
+ */
+extern void ArcherLedInit();
+
+/*
+ * Set Archer Hour LED
+ */
+extern void ArcherHourLedSet(uint8 hour, uint8 value);
+
+/*
+ * Update Archer Clock LED
+ */
+extern void ArcherClockLedUpdate();
 /*********************************************************************
 *********************************************************************/
 

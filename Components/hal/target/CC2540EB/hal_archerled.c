@@ -49,6 +49,8 @@
 #include "osal.h"
 #include "hal_board.h"
 
+#include "hal_i2c.h"
+
 /***************************************************************************************************
  *                                              TYPEDEFS
  ***************************************************************************************************/
@@ -56,6 +58,13 @@
 #define LEDCLR_GREEN    1
 #define LEDCLR_RED      2
 #define LEDCLR_YELLOW   3
+
+// [7:0]
+#define BRIGHTNESS_9532 0xff
+// [7:2]
+#define BRIGHTNESS_9632_IND 0xfc
+// [7:4]
+#define BRIGHTNESS_9632_GRP 0xf0
 
 /* LED control structure */
 typedef struct {
@@ -101,6 +110,10 @@ static uint8 preBlinkState;            // Original State before going to blink m
 #ifdef BLINK_LEDS
   static HalLedStatus_t HalLedStatusControl;
 #endif
+
+static uint32 archer9532 = 0; // [upperLED15->0, lowerLED15->0]
+static uint32 lastArcher9532 = 0;
+static uint8 archerHourTable[12] = {23, 20, 18, 16, 12, 10, 7, 5, 2, 0, 30, 27};
 
 /***************************************************************************************************
  *                                            LOCAL FUNCTION
@@ -672,8 +685,102 @@ void HalLedExitSleep( void )
 }
 
 /***************************************************************************************************
+ * @fn      ArcherLedInit
+ *
+ * @brief   Initial clock LED and color LED
+ *
+ * @param   none
+ *
+ * @return  none
+ ***************************************************************************************************/
+void ArcherLedInit()
+{
+  // Turn off LED power, P2_0 = 0
+  P2_0 = 0;
+  // Initialize Upper PCA9532
+  HalI2CInit(0x60, i2cClock_123KHZ);
+  uint8 wdata0[9] = {0x12, 0x00, BRIGHTNESS_9532, 0x00, BRIGHTNESS_9532, 0x00, 0x00, 0x00, 0x00};
+  HalI2CWrite(9, wdata0);
+  // Initialize Lower PCA9532
+  HalI2CInit(0x67, i2cClock_123KHZ);
+  HalI2CWrite(9, wdata0);
+  // Initialize Color PCA9632
+  HalI2CInit(0x62, i2cClock_123KHZ);
+  uint8 wdata1[10] = {0x80, 0x10, 0x01, BRIGHTNESS_9632_IND, BRIGHTNESS_9632_IND, BRIGHTNESS_9632_IND, 0x00, BRIGHTNESS_9632_GRP, 0x00, 0x00};
+  HalI2CWrite(10, wdata1);
+}
+
+/***************************************************************************************************
+ * @fn      ArcherHourLedSet
+ *
+ * @brief   Set Archer Hour LED
+ *
+ * @param   none
+ *
+ * @return  none
+ ***************************************************************************************************/
+void ArcherHourLedSet(uint8 hour, uint8 value)
+{
+  if (hour<12)
+  {
+    uint32 ledToSet = 0x01;
+    ledToSet = ledToSet << archerHourTable[hour];
+    if (value)
+      archer9532 |= ledToSet;
+    else
+      archer9532 &= !ledToSet;
+  }
+}
+
+/***************************************************************************************************
+ * @fn      ArcherClockLedUpdate
+ *
+ * @brief   Update Archer Clock LED
+ *
+ * @param   none
+ *
+ * @return  none
+ ***************************************************************************************************/
+void ArcherClockLedUpdate()
+{
+  // Upper LED
+  if ((archer9532 & 0xffff0000) != (lastArcher9532 & 0xffff0000))
+  {
+    uint16 upperLED = archer9532 >> 16;
+    uint8 wdata[5] = {0x16, 0x00, 0x00, 0x00, 0x00};
+    for (uint8 wdata_B=1; wdata_B<5; wdata_B++)
+    {
+      for (uint8 wdata_led=0; wdata_led<4; wdata_led++)
+      {
+        wdata[wdata_B] = wdata[wdata_B] >> 2;
+        if (upperLED & 0x0001)
+          wdata[wdata_B] |= 0x80;
+        upperLED = upperLED >> 1;
+      }
+    }
+    HalI2CInit(0x60, i2cClock_123KHZ);
+    HalI2CWrite(5, wdata);
+  }
+  // Lower LED
+  if ((archer9532 & 0x0000ffff) != (lastArcher9532 & 0x0000ffff))
+  {
+    uint16 lowerLED = archer9532 & 0xffff;
+    uint8 wdata[5] = {0x16, 0x00, 0x00, 0x00, 0x00};
+    for (uint8 wdata_B=1; wdata_B<5; wdata_B++)
+    {
+      for (uint8 wdata_led=0; wdata_led<4; wdata_led++)
+      {
+        wdata[wdata_B] = wdata[wdata_B] >> 2;
+        if (lowerLED & 0x0001)
+          wdata[wdata_B] |= 0x80;
+        lowerLED = lowerLED >> 1;
+      }
+    }
+    HalI2CInit(0x67, i2cClock_123KHZ);
+    HalI2CWrite(5, wdata);
+  }
+  lastArcher9532 = archer9532;
+}
+
+/***************************************************************************************************
 ***************************************************************************************************/
-
-
-
-
