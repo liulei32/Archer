@@ -134,6 +134,11 @@ extern void ArcherLedInit();
 extern void ArcherHourLedSet(uint8 hour, uint8 value);
 
 /*
+ * Set Archer Min LED
+ */
+extern void ArcherMinLedSet(uint8 hour, uint8 value);
+
+/*
  * Update Archer Clock LED
  */
 extern void ArcherClockLedUpdate();

@@ -66,6 +66,8 @@
 // [7:4]
 #define BRIGHTNESS_9632_GRP 0xf0
 
+#define I2CCLOCK i2cClock_123KHZ
+
 /* LED control structure */
 typedef struct {
   uint8 mode;       /* Operation mode */
@@ -114,6 +116,7 @@ static uint8 preBlinkState;            // Original State before going to blink m
 static uint32 archer9532 = 0; // [upperLED15->0, lowerLED15->0]
 static uint32 lastArcher9532 = 0;
 static uint8 archerHourTable[12] = {23, 20, 18, 16, 12, 10, 7, 5, 2, 0, 30, 27};
+static uint8 archerMinTable[16] = {22, 21, 19, 17, 14, 11, 9, 8, 6, 4, 3, 1, 31, 29, 28, 26};
 
 /***************************************************************************************************
  *                                            LOCAL FUNCTION
@@ -698,14 +701,14 @@ void ArcherLedInit()
   // Turn off LED power, P2_0 = 0
   P2_0 = 0;
   // Initialize Upper PCA9532
-  HalI2CInit(0x60, i2cClock_123KHZ);
+  HalI2CInit(0x60, I2CCLOCK);
   uint8 wdata0[9] = {0x12, 0x00, BRIGHTNESS_9532, 0x00, BRIGHTNESS_9532, 0x00, 0x00, 0x00, 0x00};
   HalI2CWrite(9, wdata0);
   // Initialize Lower PCA9532
-  HalI2CInit(0x67, i2cClock_123KHZ);
+  HalI2CInit(0x67, I2CCLOCK);
   HalI2CWrite(9, wdata0);
   // Initialize Color PCA9632
-  HalI2CInit(0x62, i2cClock_123KHZ);
+  HalI2CInit(0x62, I2CCLOCK);
   uint8 wdata1[10] = {0x80, 0x10, 0x01, BRIGHTNESS_9632_IND, BRIGHTNESS_9632_IND, BRIGHTNESS_9632_IND, 0x00, BRIGHTNESS_9632_GRP, 0x00, 0x00};
   HalI2CWrite(10, wdata1);
 }
@@ -725,6 +728,28 @@ void ArcherHourLedSet(uint8 hour, uint8 value)
   {
     uint32 ledToSet = 0x01;
     ledToSet = ledToSet << archerHourTable[hour];
+    if (value)
+      archer9532 |= ledToSet;
+    else
+      archer9532 &= !ledToSet;
+  }
+}
+
+/***************************************************************************************************
+ * @fn      ArcherMinLedSet
+ *
+ * @brief   Set Archer Min LED
+ *
+ * @param   none
+ *
+ * @return  none
+ ***************************************************************************************************/
+void ArcherMinLedSet(uint8 min, uint8 value)
+{
+  if (min<16)
+  {
+    uint32 ledToSet = 0x01;
+    ledToSet = ledToSet << archerMinTable[min];
     if (value)
       archer9532 |= ledToSet;
     else
@@ -758,7 +783,7 @@ void ArcherClockLedUpdate()
         upperLED = upperLED >> 1;
       }
     }
-    HalI2CInit(0x60, i2cClock_123KHZ);
+    HalI2CInit(0x60, I2CCLOCK);
     HalI2CWrite(5, wdata);
   }
   // Lower LED
@@ -776,7 +801,7 @@ void ArcherClockLedUpdate()
         lowerLED = lowerLED >> 1;
       }
     }
-    HalI2CInit(0x67, i2cClock_123KHZ);
+    HalI2CInit(0x67, I2CCLOCK);
     HalI2CWrite(5, wdata);
   }
   lastArcher9532 = archer9532;

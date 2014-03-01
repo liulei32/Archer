@@ -449,9 +449,21 @@ void SimpleBLEPeripheral_Init( uint8 task_id )
 
 #endif // #if defined( CC2540_MINIDK )
 
-  // initialize the ADC for battery reads
+  // Initialize the ADC for battery reads
   HalAdcInit();
   
+  // Initialize the LEDs
+  ArcherLedInit();
+  P2_0 = 1;
+  for (uint8 i=0; i<12; i++)
+  {
+    ArcherHourLedSet(i, 1);
+  }
+  for (uint8 i=0; i<16; i++)
+  {
+    ArcherMinLedSet(i, 1);
+  }
+  ArcherClockLedUpdate();
   
 #if (defined HAL_LCD) && (HAL_LCD == TRUE)
 
@@ -551,7 +563,7 @@ uint16 SimpleBLEPeripheral_ProcessEvent( uint8 task_id, uint16 events )
     
     // Register Task ID in BLECentral functions
     simpleBLECentralSetTaskID(simpleBLEPeripheral_TaskID);
-    
+      
     return ( events ^ SBP_START_DEVICE_EVT );
   }
 
